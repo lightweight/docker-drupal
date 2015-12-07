@@ -5,7 +5,7 @@ services:
 
 env:
   global:
-    - DOCKER_IMAGE_NAME=zaporylie/drupal
+    - DOCKER_IMAGE_NAME=lightweight/drupal
     - DOCKER_CONTAINER_NAME=drupal
     - MYSQL_CONTAINER_NAME=mysql
     - MYSQL_VERSION=5.5
@@ -27,4 +27,3 @@ script:
   - docker ps -a
   # Run container in test mode.
   - docker run -i --name ${DOCKER_CONTAINER_NAME} --link ${MYSQL_CONTAINER_NAME}:${MYSQL_CONTAINER_NAME} -e MYSQL_HOST_NAME=${MYSQL_HOST_NAME} -e BUILD_TEST=1 ${DOCKER_IMAGE_NAME}
-

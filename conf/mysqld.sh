@@ -18,6 +18,8 @@ StartMySQL ()
 }
 
 # Check first if user linked mysql container, if not - run mysql here.
+#
+# this shouldn't run, as we're no longer installing MySQL in this container...
 if [ -z "${MYSQL_HOST_NAME}" ]; then
 
   MYSQL_LOG="/var/log/mysql/error.log"
@@ -25,7 +27,7 @@ if [ -z "${MYSQL_HOST_NAME}" ]; then
 
   echo "=> Starting MySQL ..."
   StartMySQL
-  tail -F $MYSQL_LOG & 
+  tail -F $MYSQL_LOG &
   echo "Setting environmental variables"
   MYSQL_HOST_NAME=localhost
   MYSQL_ENV_MYSQL_ROOT_PASSWORD=`pwgen -c -n -1 12`

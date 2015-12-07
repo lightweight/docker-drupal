@@ -25,6 +25,28 @@ Simple docker image to build containers for your Drupal projects. If you are wor
 
 ## Quickstart
 
+# Dave's commands:
+
+# Build container from Dockerfile and supporting files
+docker build -t lightweight/drupal .
+
+# Launch new container
+docker run --name oeru-d7 -p 8060:80 -e USER_ID=`id -u` -e GROUP_ID=`id -g` --link mariadb:mysql --env-file ./env.list -v /home/dave/Projects/drupal/oeru-d7:/app/drupal -d -P lightweight/drupal
+
+docker run --name oeru_sso --link mariadb:mysql --env-file ./env.list -v /home/dave/Projects/drupal/oeru_sso/drupal7:/app/drupal -d -P lightweight/drupal
+
+# start the container after initially launched
+docker start lightweight/drupal
+
+I assume the use of a separate database container.
+
+ID=`docker ps -ql | awk '{ print $1}'`
+
+
+
+
+..
+
 **With** separate mysql container (recommended):
 
 ````
