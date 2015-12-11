@@ -32,7 +32,7 @@ This system expects the Drupal repository to contain the full Drupal core tree (
 docker build -t lightweight/drupal .
 
 ### Launch new container
-docker run --name mariadb-server -p 8060:80 -e USER_ID=`id -u` -e GROUP_ID=`id -g` --link mariadb:mysql --env-file ./env.list -v [path-to-your-repo, containing your drupal core dir]]:/app/drupal -d -P lightweight/drupal
+docker run --name mariadb-server -p 8680:80 -e USER_ID=`id -u` -e GROUP_ID=`id -g` --link mariadb:mysql --env-file ./env.list -v [path-to-your-repo, containing your drupal core dir]]:/app/drupal -d -P kiwilightweight/drupal
 
 ### start the container after initially launched
 docker start lightweight/drupal
