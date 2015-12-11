@@ -18,8 +18,9 @@ RUN echo "CONTAINER_USER: $CONTAINER_USER, CONTAINER_UID: $CONTAINER_UID, CONTAI
 # Create a user, with sudo permissions, to run the actual site.
 RUN addgroup --gid $CONTAINER_GID $CONTAINER_USER \
  && adduser --disabled-password --quiet --gecos "" --uid ${CONTAINER_UID} --gid ${CONTAINER_GID} --home ${DEV_DIR} ${CONTAINER_USER} \
- && adduser docker sudo \
- && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+ && adduser ${CONTAINER_USER} sudo \
+ && echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers \
+ && sudo chown -R ${CONTAINER_USER}:${CONTAINER_USER} ${DEV_DIR}
 
 #
 # Install all the packages we'll need
@@ -52,8 +53,8 @@ COPY ./conf /root/conf/
 RUN sed -i "s/variables_order.*/variables_order = \"EGPCS\"/g" /etc/php5/fpm/php.ini \
   && sed -i -e "s/;cgi.fix_pathinfo=1/cgi.fix_pathinfo=0/g" /etc/php5/fpm/php.ini \
   && sed -i -e "s/;daemonize\s*=\s*yes/daemonize = no/g" /etc/php5/fpm/php-fpm.conf \
-  && sed -i -e "s/www-data/docker/g" /etc/php5/fpm/php-fpm.conf \
-  && sed -i -e "s/www-data/docker/g" /etc/php5/fpm/pool.d/www.conf \
+  && sed -i -e "s/www-data/${CONTAINER_USER}/g" /etc/php5/fpm/php-fpm.conf \
+  && sed -i -e "s/www-data/${CONTAINER_USER}/g" /etc/php5/fpm/pool.d/www.conf \
   && find /etc/php5/cli/conf.d/ -name "*.ini" -exec sed -i -re 's/^(\s*)#(.*)/\1;\2/g' {} \; \
   && sed -ri 's/^expose_php\s*=\s*On/expose_php = Off/g' /etc/php5/fpm/php.ini \
   && sed -ri 's/^expose_php\s*=\s*On/expose_php = Off/g' /etc/php5/cli/php.ini \
@@ -62,17 +63,17 @@ RUN sed -i "s/variables_order.*/variables_order = \"EGPCS\"/g" /etc/php5/fpm/php
   && sed -ri 's/^upload_max_filesize\s*=\s*2M/upload_max_filesize = 64M/g' /etc/php5/cli/php.ini
 # Set up nginx
 RUN echo "daemon off;" >> /etc/nginx/nginx.conf \
- && sed -i -e "s/www-data/docker/g" /etc/nginx/nginx.conf \
+ && sed -i -e "s/www-data/${CONTAINER_USER}/g" /etc/nginx/nginx.conf \
  && sed -i -e "s/keepalive_timeout\s*65/keepalive_timeout 2/" /etc/nginx/nginx.conf \
  && cp /root/conf/drupal.conf /etc/nginx/sites-available/default
 # Set up Composer for root user
 RUN cd /home \
   && composer global require drush/drush:dev-master \
-  && echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> ~/.bashrc
-# Set up Composer for the docker user
-RUN cp -a $HOME/.composer ${DEV_DIR} \
+  && echo 'export PATH="/root/.composer/vendor/bin:$PATH"' >> /root/.bashrc
+# Set up Composer for the ${CONTAINER_USER} user
+RUN cp -a /root/.composer ${DEV_DIR} \
  && echo 'export PATH="${DEV_DIR}/.composer/vendor/bin:$PATH"' >> ${DEV_DIR}/.bashrc \
- && sudo chown -R docker:docker ${DEV_DIR}
+ && sudo chown -R ${CONTAINER_USER}:${CONTAINER_USER} ${DEV_DIR}
 # Set up auto-running of nginx
 RUN mkdir -p /var/run/nginx /var/run/sshd /var/log/supervisor
 # Prepare to run script installing Drupal
@@ -105,6 +106,11 @@ RUN cp /root/conf/sshd.sh /root/conf/after-start \
 RUN echo "export VISIBLE=now" >> /etc/profile \
  && echo "export TERM=xterm" >> /etc/bash.bashrc \
  && cp /root/conf/mysqld.sh /root/conf/before-start/00-mysqld.sh
+# Sort out the Ruby + Compass + SaSS requirements
+RUN apt-get -yq install \
+ compass-bootstrap-sass-plugin \
+ ruby-bootstrap-sass \
+ && gem install compass
 
 # Set up the language variables
 ENV LANG en_NZ.UTF-8
