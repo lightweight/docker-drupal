@@ -28,22 +28,44 @@ This system expects the Drupal repository to contain the full Drupal core tree (
 
 ## Quickstart
 
+First, read though the Dockerfile - that'll provide you with some insight as to what the Docker container's doing. You'll want to update the ENV values for your user on the local system (UserID and GroupID).
+
 ### Build container from Dockerfile and supporting files
-docker build -t lightweight/drupal .
+docker build -t kiwilightweight/drupal .
 
 ### Launch new container
 docker run --name mariadb-server -p 8680:80 -e USER_ID=`id -u` -e GROUP_ID=`id -g` --link mariadb:mysql --env-file ./env.list -v [path-to-your-repo, containing your drupal core dir]]:/app/drupal -d -P kiwilightweight/drupal
 
-### start the container after initially launched
-docker start lightweight/drupal
+### start the container after it already exists
+docker start kiwilightweight/drupal
 
 ## Some useful commandline things
+
+### creating a shortcut for your container-of-interest
 
 If your drupal dev container is the last one you've launched, you can get its ID like this and assign it to a handy shell variable:
 
 ID=`docker ps -ql | awk '{ print $1}'`
 
-# Inherited notes from
+### Getting a command prompt on the container
+
+docker exec -it $ID /bin/bash
+
+or as the "docker" user:
+
+docker exec -it --user=docker $ID /bin/bash
+
+# Known Problems/ToDos
+
+ * The "docker" user's path for drush doesn't get set up right at the moment. Need to work on that. Workaround:
+
+  sudo cp -a /root/.composer /app
+  sudo cp /root/.bashrc /app
+  sudo chown -R docker:docker /app/.composer /app/.bashrc
+
+ * want to automate setting the ENV value (and making it dynamic at "run" time) for the dev user and group.
+
+# Inherited notes from zaporylie
 
 **With** separate mysql container (recommended):
 

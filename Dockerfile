@@ -69,10 +69,10 @@ RUN echo "daemon off;" >> /etc/nginx/nginx.conf \
 # Set up Composer for root user
 RUN cd /home \
   && composer global require drush/drush:dev-master \
-  && echo 'export PATH="/root/.composer/vendor/bin:$PATH"' >> /root/.bashrc
+  && echo 'export PATH="${HOME}/.composer/vendor/bin:$PATH"' >> /root/.bashrc
 # Set up Composer for the ${CONTAINER_USER} user
 RUN cp -a /root/.composer ${DEV_DIR} \
- && echo 'export PATH="${DEV_DIR}/.composer/vendor/bin:$PATH"' >> ${DEV_DIR}/.bashrc \
+ && echo 'export PATH="${HOME}/.composer/vendor/bin:$PATH"' >> ${DEV_DIR}/.bashrc \
  && sudo chown -R ${CONTAINER_USER}:${CONTAINER_USER} ${DEV_DIR}
 # Set up auto-running of nginx
 RUN mkdir -p /var/run/nginx /var/run/sshd /var/log/supervisor
