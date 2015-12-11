@@ -112,5 +112,3 @@ docker run \
 ## Credits
 
 This project is a modified version by Dave Lane <dave@davelane.nz> of a container originally created by Jakub Piasecki <jakub@piaseccy.pl>
-
-[![nodesource/node](https://hub.docker.com/r/kiwilightweight/drupal)]
