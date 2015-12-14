@@ -26,6 +26,10 @@ Note: I don't recommend using this as it is for development purposes. You'll pro
 
 This system expects the Drupal repository to contain the full Drupal core tree (for D6-8) as a directory within the top level. This allows for other useful documentation, scripts, database dumps, etc. at the same level, but not mixed up in the Drupal code base.
 
+## Future Plans
+
+One thing this container doesn't do yet is support outgoing email - will build that in to the next version, using an external email service like Mandrill... Also, in my work on this to date, I need to improve the container's logging capabilities to support debugging.
+
 ## Quickstart
 
 First, read though the Dockerfile - that'll provide you with some insight as to what the Docker container's doing. You'll want to update the ENV values for your user on the local system (UserID and GroupID).
